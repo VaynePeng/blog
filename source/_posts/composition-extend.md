@@ -1,5 +1,6 @@
 ---
 title: 组合继承的实现
+date: 2022-10-27  10:24:10
 tags: [JavaScript ]
 category: 前端
 ---

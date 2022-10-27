@@ -1,5 +1,6 @@
 ---
 title: renderer 函数的简单实现
+date: 2022-10-27  0:46:43
 tags: [JavaScript, Vue]
 category: 前端
 ---

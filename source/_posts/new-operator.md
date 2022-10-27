@@ -1,5 +1,6 @@
 ---
 title: new 运算符的实现
+date: 2022-10-26  23:33:25
 tags: [JavaScript]
 category: 前端
 ---

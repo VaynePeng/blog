@@ -1,5 +1,6 @@
 ---
 title: forEach 和 map 的实现
+date: 2022-10-27  0:19:55
 tags: [JavaScript]
 category: 前端
 ---
