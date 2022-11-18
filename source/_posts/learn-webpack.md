@@ -57,106 +57,102 @@ category: 前端
 
 ### 我们需要做些什么
 
-1. webpack 默认是不能处理样式、图片、html 等资源的，所以我们需要借助一系列的 loader 来帮助我们处理这些资源 --> loader的加载顺序为从下往上，从右往左
+> webpack 默认是不能处理样式、图片、html 等资源的，所以我们需要借助一系列的 loader 来帮助我们处理这些资源 --> loader的加载顺序为从下往上，从右往左
 
-   #### 处理 css 资源
+#### 处理 css 资源
 
-   如果想让 webpack 处理 css 资源，就必须加入两个相关的 loader，css-loader 和 style-loader
+如果想让 webpack 处理 css 资源，就必须加入两个相关的 loader，css-loader 和 style-loader
 
-   ```javascript
-   pnpm add -D css-loader style-loader
-   ```
+```javascript
+pnpm add -D css-loader style-loader
+```
 
-   其中：（如下介绍都是这些 loader 的默认行为，如果需要改变默认行为请参考 [loaders](https://webpack.js.org/loaders)）
+其中：（如下介绍都是这些 loader 的默认行为，如果需要改变默认行为请参考 [loaders](https://webpack.js.org/loaders)）
 
-   - css-loader：将 css 编译成 commonjs 模块
-   - style-loader：将 js 中的 css 通过使用多个 style 标签自动把 styles 插入到 DOM 中
+- css-loader：将 css 编译成 commonjs 模块
+- style-loader：将 js 中的 css 通过使用多个 style 标签自动把 styles 插入到 DOM 中
 
-   ```javascript
-   mopdule.exports = {
-     ...otherConfig,
-     module: {
-       rules: [
-         {
-           test: /.css$/i, // 正则匹配某个类型的文件
-           use: [ 'style-loader', 'css-loader' ] // 对上面匹配到的文件使用哪个 loader
-         }
-       ]
-     }
-   }
-   ```
+```javascript
+mopdule.exports = {
+  ...otherConfig,
+  module: {
+    rules: [
+      {
+        test: /.css$/i, // 正则匹配某个类型的文件
+        use: [ 'style-loader', 'css-loader' ] // 对上面匹配到的文件使用哪个 loader
+      }
+    ]
+  }
+}
+```
 
-   通过如上的配置，我们就可以使用 webpack 正常的打包 css 文件了，需要注意的是，css文件必须在 js 中被引入，否则就不会被打包
+通过如上的配置，我们就可以使用 webpack 正常的打包 css 文件了，需要注意的是，css文件必须在 js 中被引入，否则就不会被打包
 
-   #### 使用 css 预处理器
+#### 使用 css 预处理器
 
-   在一般开发中，我们还会使用一些 css 预处理器来提升开发效率，以 less 为例：
+在一般开发中，我们还会使用一些 css 预处理器来提升开发效率，以 less 为例：
 
-   - 同样的 webpack 不支持我们直接使用 less 我们需要使用 less-loader 来解析我们的 less 文件
+- 同样的 webpack 不支持我们直接使用 less 我们需要使用 less-loader 来解析我们的 less 文件
 
-     ```javascript
-     pnpm add -D less-loader // 如果没有安装 less 的话，还需要安装 less
-     ```
+  ```javascript
+  pnpm add -D less-loader // 如果没有安装 less 的话，还需要安装 less
+  ```
 
-   - less-loader：将 less 编译为 css
+- less-loader：将 less 编译为 css
 
-     ```javascript
-     mopdule.exports = {
-       ...otherConfig,
-       module: {
-         rules: [
-           {
-             test: /.less$/i,
-             use: [ 'style-loader', 'css-loader', 'less-loader' ]
-           }
-         ]
-       }
-     }
-     ```
+  ```javascript
+  mopdule.exports = {
+    ...otherConfig,
+    module: {
+      rules: [
+        {
+          test: /.less$/i,
+          use: [ 'style-loader', 'css-loader', 'less-loader' ]
+        }
+      ]
+    }
+  }
+  ```
 
-   #### 处理资源文件
-   在 webpack5 中我们可以通过配置资源模块来使用资源文件，而不用配置额外的 loader
+#### 处理资源文件
+在 webpack5 中我们可以通过配置资源模块来使用资源文件，而不用配置额外的 loader
 
-   - 资源模块的类型
+- 资源模块的类型
 
-     - asset/resource：发送一个单独的文件并导出 URL
+  - asset/resource：发送一个单独的文件并导出 URL
 
-     - asset/inline：导出一个资源的 data URI
+  - asset/inline：导出一个资源的 data URI
 
-     - asset/source：导出资源的源代码
+  - asset/source：导出资源的源代码
 
-     - asset：在导出一个 data URI 和发送一个单独的文件之间自动选择
+  - asset：在导出一个 data URI 和发送一个单独的文件之间自动选择
 
-       ```javascript
-       mopdule.exports = {
-         ...otherConfig,
-         module: {
-           rules: [
-             {
-               test: /\.(png|jpg)$/i,
-               type: 'asset', // asset/resource | asset/inline | asset/source | asset
-               parser: {
-                 dataUrlCondition: {
-                   maxSize: 50 * 1024 // 小于 50kb 会转化为 base64
-                   // bese64 可以减少网络请求次数，但是会提升资源体积，一般只转化小文件为 base64
-                 }
-               },
-               // 构建配置
-               generator: {
-                 // hash 打包后的文件名
-                 // ext 文件拓展名
-                 filename: 'images/[hash][ext][query]' // 输入文件的位置和名称
-               }
-             }
-           ]
-         }
-       }
-       ```
-
-   #### xxx
-
-   ### 结语
-
-
+    ```javascript
+    mopdule.exports = {
+      ...otherConfig,
+      module: {
+        rules: [
+          {
+            test: /\.(png|jpg)$/i,
+            type: 'asset', // asset/resource | asset/inline | asset/source | asset
+            parser: {
+              dataUrlCondition: {
+                maxSize: 50 * 1024 // 小于 50kb 会转化为 base64
+                // bese64 可以减少网络请求次数，但是会提升资源体积，一般只转化小文件为 base64
+              }
+            },
+            // 构建配置
+            generator: {
+              // hash 打包后的文件名
+              // ext 文件拓展名
+              filename: 'images/[hash][ext][query]' // 输入文件的位置和名称
+            }
+          }
+        ]
+      }
+    }
+    ```
+    
+  - 
 
 ​	
