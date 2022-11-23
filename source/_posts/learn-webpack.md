@@ -11,7 +11,7 @@ category: 前端
 
 我们可以使用 webpack 将浏览器不支持的语法转化为可以被浏览器执行的语法
 
-本文的[github](https://github.com/VaynePeng/learn-webpack)
+本文的 [github](https://github.com/VaynePeng/learn-webpack)
 
 ### 起步
 
