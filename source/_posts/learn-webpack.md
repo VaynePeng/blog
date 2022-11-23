@@ -17,7 +17,7 @@ category: 前端
 
 1. 安装 webpack 和 webpack-cli
 
-   ```javascript
+   ```bash
    pnpm add -D webpack webpack-cli
    ```
 
@@ -59,11 +59,11 @@ category: 前端
 
 > webpack 默认是不能处理样式、图片、html 等资源的，所以我们需要借助一系列的 loader 来帮助我们处理这些资源 --> loader的加载顺序为从下往上，从右往左
 
-#### 处理 css 资源
+#### 处理 CSS 文件
 
 如果想让 webpack 处理 css 资源，就必须加入两个相关的 loader，css-loader 和 style-loader
 
-```javascript
+```bash
 pnpm add -D css-loader style-loader
 ```
 
@@ -79,7 +79,7 @@ mopdule.exports = {
     rules: [
       {
         test: /.css$/i, // 正则匹配某个类型的文件
-        use: [ 'style-loader', 'css-loader' ] // 对上面匹配到的文件使用哪个 loader
+        use: ['style-loader', 'css-loader'] // 对上面匹配到的文件使用哪个 loader
       }
     ]
   }
@@ -88,14 +88,14 @@ mopdule.exports = {
 
 通过如上的配置，我们就可以使用 webpack 正常的打包 css 文件了，需要注意的是，css文件必须在 js 中被引入，否则就不会被打包
 
-#### 使用 css 预处理器
+#### 使用 CSS 预处理器
 
 在一般开发中，我们还会使用一些 css 预处理器来提升开发效率，以 less 为例：
 
 - 同样的 webpack 不支持我们直接使用 less 我们需要使用 less-loader 来解析我们的 less 文件
 
-  ```javascript
-  pnpm add -D less-loader // 如果没有安装 less 的话，还需要安装 less
+  ```bash
+  pnpm add -D less-loader # 如果没有安装 less 的话，还需要安装 less
   ```
 
 - less-loader：将 less 编译为 css
@@ -107,7 +107,7 @@ mopdule.exports = {
       rules: [
         {
           test: /.less$/i,
-          use: [ 'style-loader', 'css-loader', 'less-loader' ]
+          use: ['style-loader', 'css-loader', 'less-loader']
         }
       ]
     }
@@ -120,13 +120,16 @@ mopdule.exports = {
 - 资源模块的类型
 
   - asset/resource：发送一个单独的文件并导出 URL
-
   - asset/inline：导出一个资源的 data URI
-
   - asset/source：导出资源的源代码
-
   - asset：在导出一个 data URI 和发送一个单独的文件之间自动选择
-
+  
+- 图片资源的打包
+  
+    图片资源的打包一般区别于其它资源，我们希望对小图片进行处理，将他们转化为 base64 以减少请求数量
+    
+    - 我们将小于 50kb 的图片转化为 base64，大于 50kb 的图片直接输出，使用 generator 配置，统一输出到 images 的目录下：
+    
     ```javascript
     mopdule.exports = {
       ...otherConfig,
@@ -134,10 +137,10 @@ mopdule.exports = {
         rules: [
           {
             test: /\.(png|jpg)$/i,
-            type: 'asset', // asset/resource | asset/inline | asset/source | asset
+            type: 'asset',
             parser: {
               dataUrlCondition: {
-                maxSize: 50 * 1024 // 小于 50kb 会转化为 base64
+                maxSize: 50 * 1024 // 小于 50kb 会转化为 base64 --> 默认为 8kb
                 // bese64 可以减少网络请求次数，但是会提升资源体积，一般只转化小文件为 base64
               }
             },
@@ -153,6 +156,137 @@ mopdule.exports = {
     }
     ```
     
-  - 
+- 处理其它资源类型
 
-​	
+  在实际的开发过程中，我们会使用多种不同类型的文件，如果我们可能希望把某几种类型的文件输出在一起，如同上面配置图片资源一样，我们可以通过配置 generator 的选项来控制
+
+  - 首先我们需要注意 type 值的改变，比如下面我们的 ttf 和 woff 并不能被转换为 base64 所以我们在处理其他类型资源的时候一定要注意 type 的值不能写错，不然你的文件可能不会被打包到结果中
+
+  - 我们以引入iconfont中的字体为例，我们希望把 font 都输出到 fonts 的目录下，那么我们就可以这样写：
+
+    ```javascript
+    module.exports = {
+      ...otherConfig,
+      module: {
+        rules: [
+          {
+            test: /\.(ttf|woff2?)$/,
+            type: 'asset/resource',
+            generator: {
+              filename: 'fonts/[hash][ext][query]'
+            }
+          }
+        ]
+      }
+    }
+    ```
+
+#### 处理 HTML 文件
+
+在前面的使用中，我们都是手动引入打包后的文件，当输出文件为多个时，手动引入不仅麻烦，还极易出错，所以我们可以使用一个插件 html-webpack-plugin 
+
+```bash
+pnpm add -D html-webpack-plugin
+```
+
+这个插件可以帮我们自动生成 html 文件，并引入相关的文件
+
+```javascript
+const { resolve } = require('path')
+const HTMLWebpackPlugin = require('html-webpack-plugin')
+
+module.exports = {
+  ...otherConfig,
+  plugins: [
+    new HTMLWebpackPlugin({
+      template: resolve(__dirname, 'public/index.html') // 模板
+    })
+  ]
+}
+```
+
+其中 template 为我们设置的基础模板
+
+#### 自动构建
+
+或许你受够了没修改一次重新构建的方式，那么，我很高兴告诉你，我们可以使用 webpack-dev-server 来自动构建并更新我们的项目
+
+```bash
+pnpm add -D webpack-dev-server
+```
+
+我们只需要简单的配置，即可使用这个美妙的功能：
+
+- 开发模式
+
+  ```javascript
+  const { resolve } = require('path')
+  
+  module.exports = {
+    ...otherConfig,
+    devServer: {
+      host: 'localhost', // 本地地址
+      open: true, // 自动打开浏览器
+      port: 9000 // 服务端口
+    }
+  }
+  ```
+
+- 生产模式
+
+  ```javascript
+  xx
+  ```
+
+  xxxx
+
+### 常见项目配置项
+
+- eslint
+
+  - 安装：
+
+    ```bash
+    pnpm add -D eslint eslint-webpack-plugin
+    ```
+
+  - 使用：
+
+    ```javascript
+    const ESLintPlugin = require('eslint-webpack-plugin')
+    
+    module.exports = {
+      ...otherConfig,
+      plugins: [
+        new ESLintPlugin()
+      ]
+    }
+    ```
+  
+- babel
+
+  - 安装
+
+    ```bash
+    pnpm add -D babel-loader @babel/core @babel/preset-env
+    ```
+
+  - 使用
+
+    ```javascript
+    module.exports = {
+      ...otherConfig,
+      module: {
+        rules: [
+          {
+            test: /\.js$/,
+            exclude: /node_modules/,
+            use: ['babel-loader']
+          }
+        ]
+      }
+    }
+    ```
+
+- xxx
+
