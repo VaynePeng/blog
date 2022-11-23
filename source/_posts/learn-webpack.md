@@ -209,7 +209,7 @@ module.exports = {
 
 #### 自动构建
 
-或许你受够了没修改一次重新构建的方式，那么，我很高兴告诉你，我们可以使用 webpack-dev-server 来自动构建并更新我们的项目
+或许你受够了每修改一次重新构建的方式，那么，我很高兴告诉你，我们可以使用 webpack-dev-server 来自动构建并更新我们的项目
 
 ```bash
 pnpm add -D webpack-dev-server
