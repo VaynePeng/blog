@@ -57,7 +57,7 @@ category: 前端
 
 ### 我们需要做些什么
 
-> webpack 默认是不能处理样式、图片、html 等资源的，所以我们需要借助一系列的 loader 来帮助我们处理这些资源 --> loader的加载顺序为从下往上，从右往左
+> webpack 默认是不能处理样式、图片、html 等资源的，所以我们需要借助一系列的 loader 来帮助我们处理这些资源 --> loader 的加载顺序为从下往上，从右往左
 
 #### 处理 CSS 文件
 
@@ -136,7 +136,7 @@ mopdule.exports = {
       module: {
         rules: [
           {
-            test: /\.(png|jpg)$/i,
+            test: /\.(png|jpg|svg)$/i,
             type: 'asset',
             parser: {
               dataUrlCondition: {
@@ -162,7 +162,7 @@ mopdule.exports = {
 
   - 首先我们需要注意 type 值的改变，比如下面我们的 ttf 和 woff 并不能被转换为 base64 所以我们在处理其他类型资源的时候一定要注意 type 的值不能写错，不然你的文件可能不会被打包到结果中
 
-  - 我们以引入iconfont中的字体为例，我们希望把 font 都输出到 fonts 的目录下，那么我们就可以这样写：
+  - 我们以引入 iconfont 中的字体为例，我们希望把 font 都输出到 fonts 的目录下，那么我们就可以这样写：
 
     ```javascript
     module.exports = {
@@ -207,6 +207,30 @@ module.exports = {
 
 其中 template 为我们设置的基础模板
 
+#### 常见文件类型和路径的快捷使用
+
+在日常的开发中，我们文件几乎都会引入其它的资源文件，他们可能分布在多个不同的文件夹中，获取需要好几层目录才能找到它们，引入他们既麻烦，还容易出错，所以我们一般都会在 webpack 中配置 resolve 选项，来帮助我们更方便的使用他们
+
+```javascript
+const { resolve } = require('path')
+
+module.exports = {
+  ...otherConfig,
+  resolve: {
+    alias: {
+      'xxx': resolve(__dirname, 'src/xxx') 
+    },
+    extensions: ['.js', '.ts', '.json'] // 如果你想引入时写后缀，那么你可以使用 extensions 定义他自动查找哪些文件类型进行匹配
+  }
+}
+```
+
+```javascript
+import usexxx from 'xxx/xx'
+```
+
+就这样，我们无论在哪个层级都可以很方便的引入其它资源，但需要注意，xxx 不要与你使用的其它模块名称重复，resolve.alias 优先级高于其它模块解析方式，所以会让它们不生效
+
 #### 自动构建
 
 或许你受够了每修改一次就需要重新构建的方式，那么，我很高兴告诉你，我们可以使用 webpack-dev-server 来自动构建并更新我们的项目
@@ -217,7 +241,7 @@ pnpm add -D webpack-dev-server
 
 我们只需要简单的配置，即可使用这个美妙的功能：
 
-- 开发模式
+- 开发服务器
 
   ```javascript
   const { resolve } = require('path')
@@ -231,14 +255,6 @@ pnpm add -D webpack-dev-server
     }
   }
   ```
-
-- 生产模式
-
-  ```javascript
-  xx
-  ```
-
-  xxxx
 
 ### 常见项目配置项
 
@@ -263,7 +279,7 @@ pnpm add -D webpack-dev-server
     }
     ```
   
-- babel
+- babel --> 处理 js 兼容性
 
   - 安装
 
@@ -288,5 +304,77 @@ pnpm add -D webpack-dev-server
     }
     ```
 
-- xxx
+- mini-css-extract-plugin --> 本插件会将 CSS 提取到单独的文件中，为每个包含 CSS 的 JS 文件创建一个 CSS 文件，并且支持 CSS 和 SourceMaps 的按需加载
+
+  在之前的使用过程中，我们会发现，我们的 css 文件是和 js 文件打包到一起的，导致我们的 js 文件非常大，导致样式加载过慢，影响用户体验，那么我们可以使用这个插件来将 css 样式分离
+
+  - 安装
+
+    ```bash
+    pnpm add -D mini-css-extract-plugin
+    ```
+
+  - 使用
+
+    ```javascript
+    const MiniCssExtractPlugin = require("mini-css-extract-plugin")
+    
+    mopdule.exports = {
+      ...otherConfig,
+      module: {
+        rules: [
+          {
+            test: /.less$/i,
+            use: [MiniCssExtractPlugin.loader, 'css-loader', 'less-loader']
+          }
+        ]
+      },
+      plugins: [
+        new MiniCssExtractPlugin()
+      ]
+    }
+    ```
+
+    我们需要把之前的 style-loader 换成 MiniCssExtractPlugin.loader 并且在 plugins 中注册，这样再次打包，我们的 css 样式将会在 js 文件中分离出来
+
+- postcss 处理 css 兼容性
+
+  - 安装
+
+    ```bash
+    pnpm add -D postcss-loader postcss postcss-preset-env
+    ```
+
+  - 使用
+
+    ```javascript
+    const MiniCssExtractPlugin = require("mini-css-extract-plugin")
+    
+    mopdule.exports = {
+      ...otherConfig,
+      module: {
+        rules: [
+          {
+            test: /.less$/i,
+            use: [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader', 'less-loader']
+          }
+        ]
+      },
+      plugins: [
+        new MiniCssExtractPlugin()
+      ]
+    }
+    ```
+
+    ```json
+    // package.json
+    
+    "browserslist": [
+        "ie >= 8"
+      ]
+    }
+    ```
+
+  - 
+
 
