@@ -251,7 +251,7 @@ pnpm add -D webpack-dev-server
     devServer: {
       host: 'localhost', // 本地地址
       open: true, // 自动打开浏览器
-      port: 9000 // 服务端口
+      port: 8080 // 服务端口
     }
   }
   ```
@@ -370,11 +370,10 @@ pnpm add -D webpack-dev-server
     // package.json
     
     "browserslist": [
-        "ie >= 8"
+        "ie >= 8" // 兼容的浏览器版本
       ]
     }
     ```
 
   - 
-
 
