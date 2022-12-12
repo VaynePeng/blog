@@ -319,7 +319,7 @@ pnpm add -D webpack-dev-server
     ```javascript
     const MiniCssExtractPlugin = require("mini-css-extract-plugin")
     
-    mopdule.exports = {
+    module.exports = {
       ...otherConfig,
       module: {
         rules: [
@@ -368,12 +368,12 @@ pnpm add -D webpack-dev-server
 
     ```json
     // package.json
-    
     "browserslist": [
-        "ie >= 8" // 兼容的浏览器版本
-      ]
-    }
+      "last 1 version",
+      "> 1%",
+      "not dead"
+    ]
     ```
 
-  - 
+    
 
